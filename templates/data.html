@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Dataset - SolarSense</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 15px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        .data-table th {
+            padding: 12px;
+            text-align: left;
+            background: #f0f3f7;
+            border-bottom: 2px solid #ddd;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            white-space: nowrap;
+        }
+
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .columns {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fill, minmax(220px, 1fr));
+
+            gap: 10px;
+        }
+
+        .column-item {
+            padding: 12px;
+            background: #f5f7fa;
+            border-radius: 8px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>☀️ SolarSense Dataset</h1>
+
+        <p>
+            Solar Power Plant Generation & Weather Data
+        </p>
+
+        <p>
+            Total Rows: <strong>{{ rows }}</strong>
+        </p>
+
+        <p>
+            Total Columns: <strong>{{ columns_count }}</strong>
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Dataset Preview</h2>
+
+        <p>
+            Showing the first 12 rows of the dataset.
+        </p>
+
+        <div class="table-container">
+
+            {{ preview | safe }}
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Dataset Columns</h2>
+
+        <div class="columns">
+
+            {% for column in columns %}
+
+                <div class="column-item">
+
+                    {{ column }}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

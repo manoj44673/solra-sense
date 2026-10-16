@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}SolarSense Dashboard{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <p class="eyebrow">SOLAR ANALYTICS + MACHINE LEARNING</p>
+    <h1>SolarSense</h1>
+    <p>Analyze solar generation and weather data, explore patterns, compare regression models, and estimate AC power and potential daytime underperformance.</p>
+  </div>
+  <div class="sun">☀</div>
+</section>
+
+<div class="cards">
+{% for k,v in [('Records',summary.rows),('Columns',summary.columns),('Plants',summary.plants),('Inverters',summary.inverters),('Potential faults',summary.faults),('Fault rate',summary.fault_rate ~ '%'),('Max AC power',summary.max_ac)] %}
+<div class="card"><span>{{k}}</span><strong>{{v}}</strong></div>
+{% endfor %}
+</div>
+
+<section class="panel">
+<h2>Project workflow</h2>
+<div class="workflow">
+  <div>1. Load raw CSV data</div><div>2. Merge generation + weather</div><div>3. Perform EDA</div>
+  <div>4. Train regression models</div><div>5. Compare ensemble models</div><div>6. Unsupervised learning</div><div>7. Live prediction</div>
+</div>
+</section>
+
+<section class="panel">
+<h2>Model performance</h2>
+<div class="metrics">
+<div><b>Fault accuracy</b><span>{{ (metrics.fault.accuracy*100)|round(2) if metrics and metrics.fault else '—' }}%</span></div>
+<div><b>Fault recall</b><span>{{ (metrics.fault.recall*100)|round(2) if metrics and metrics.fault else '—' }}%</span></div>
+<div><b>Fault F1</b><span>{{ (metrics.fault.f1*100)|round(2) if metrics and metrics.fault else '—' }}%</span></div>
+<div><b>Generation R²</b><span>{{ metrics.generation.r2|round(3) if metrics and metrics.generation else '—' }}</span></div>
+</div>
+</section>
+
+<section class="cards">
+<a class="card link-card" href="{{ url_for('eda_page') }}"><h2>EDA</h2><p>Dataset information, statistics, missing values, outliers, correlations and visual findings.</p></a>
+<a class="card link-card" href="{{ url_for('regression_page') }}"><h2>Regression</h2><p>Linear Regression, Ridge and Random Forest comparison for AC_POWER.</p></a>
+<a class="card link-card" href="{{ url_for('ensemble_page') }}"><h2>Ensemble</h2><p>Compare Random Forest, Decision Tree, AdaBoost and optional XGBoost.</p></a>
+<a class="card link-card" href="{{ url_for('unsupervised_page') }}"><h2>Unsupervised Learning</h2><p>K-Means, hierarchical clustering, DBSCAN, PCA, t-SNE, UMAP and anomaly detection.</p></a>
+<a class="card link-card" href="{{ url_for('predict_page') }}"><h2>Predict</h2><p>Enter a plant observation to estimate AC generation and potential fault probability.</p></a>
+</section>
+
+<section class="panel">
+<h2>About the potential fault flag</h2>
+<p>The supplied dataset has no ground-truth maintenance fault label. SolarSense therefore derives an operational <b>potential fault/anomaly flag</b> when irradiation is above 0.20 and AC power is at or below 1.0. This is not a confirmed physical fault diagnosis.</p>
+</section>
+{% endblock %}

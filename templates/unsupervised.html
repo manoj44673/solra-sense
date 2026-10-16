@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}SolarSense · Unsupervised Learning{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div>
+    <p class="eyebrow">UNSUPERVISED MACHINE LEARNING</p>
+    <h1>Discover Solar Data Structure</h1>
+    <p>Find operating-condition groups, dense regions, low-dimensional structure and unusual solar observations without using a target label.</p>
+  </div>
+  <div class="sun">◌</div>
+</section>
+
+{% if error %}
+<section class="panel">
+  <h2>Unsupervised analysis could not run</h2>
+  <p>{{ error }}</p>
+  {% if umap and umap.error %}<p>{{ umap.error }}</p>{% endif %}
+</section>
+{% else %}
+
+<section class="panel">
+  <h2>Features used</h2>
+  <p>Identifiers and the derived <b>FAULT_FLAG</b> are intentionally excluded. The algorithms use physical/operational measurements only.</p>
+  <div class="workflow">
+    {% for feature in features %}<div>{{ feature }}</div>{% endfor %}
+  </div>
+</section>
+
+<section class="cards">
+  <div class="card"><span>K-Means clusters</span><strong>{{ kmeans.clusters }}</strong></div>
+  <div class="card"><span>K-Means silhouette</span><strong>{{ kmeans.silhouette if kmeans.silhouette is not none else '—' }}</strong></div>
+  <div class="card"><span>DBSCAN clusters</span><strong>{{ dbscan.clusters }}</strong></div>
+  <div class="card"><span>DBSCAN noise</span><strong>{{ dbscan.noise_percent }}%</strong></div>
+  <div class="card"><span>PCA variance</span><strong>{{ pca.total_variance }}%</strong></div>
+  <div class="card"><span>Anomalies</span><strong>{{ anomaly.count }}</strong></div>
+  <div class="card"><span>Anomaly rate</span><strong>{{ anomaly.percentage }}%</strong></div>
+</section>
+
+<section class="panel">
+  <h2>1. K-Means Clustering</h2>
+  <p>Groups observations into four broad solar operating conditions. Silhouette score measures how separated the resulting groups are.</p>
+  {% if kmeans.plot %}<img class="analysis-plot" src="{{ url_for('static', filename=kmeans.plot) }}" alt="K-Means clusters">{% endif %}
+</section>
+
+<section class="panel">
+  <h3>K-Means cluster summary</h3>
+  <table class="data-table">
+    <thead><tr><th>Cluster</th><th>Records</th><th>Percentage</th><th>Avg Irradiation</th><th>Avg AC Power</th></tr></thead>
+    <tbody>
+    {% for row in kmeans.summary %}
+      <tr><td>{{ row.cluster }}</td><td>{{ row.records }}</td><td>{{ row.percentage }}%</td><td>{{ row.avg_irradiation }}</td><td>{{ row.avg_ac_power }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="panel">
+  <h2>2. Hierarchical Clustering</h2>
+  <p>Agglomerative clustering builds groups from smaller observations upward. A representative sample is used to keep the dashboard responsive.</p>
+  {% if hierarchical.plot %}<img class="analysis-plot" src="{{ url_for('static', filename=hierarchical.plot) }}" alt="Hierarchical clustering">{% endif %}
+  <p><b>Sample size:</b> {{ hierarchical.sample_size }} · <b>Silhouette:</b> {{ hierarchical.silhouette if hierarchical.silhouette is not none else '—' }}</p>
+</section>
+
+<section class="panel">
+  <h2>3. DBSCAN</h2>
+  <p>DBSCAN identifies dense operating regions and labels isolated observations as noise (<b>-1</b>). This is useful for finding unusual operating patterns.</p>
+  {% if dbscan.plot %}<img class="analysis-plot" src="{{ url_for('static', filename=dbscan.plot) }}" alt="DBSCAN clusters">{% endif %}
+  <p><b>Clusters:</b> {{ dbscan.clusters }} · <b>Noise:</b> {{ dbscan.noise }} of {{ dbscan.sample_size }} sampled observations ({{ dbscan.noise_percent }}%).</p>
+</section>
+
+<section class="panel">
+  <h2>4. PCA</h2>
+  <p>PCA compresses the standardized solar measurements into two principal components while preserving as much variation as possible.</p>
+  {% if pca.plot %}<img class="analysis-plot" src="{{ url_for('static', filename=pca.plot) }}" alt="PCA visualization">{% endif %}
+  <p><b>PC1:</b> {{ pca.variance[0] if pca.variance|length > 0 else '—' }}% · <b>PC2:</b> {{ pca.variance[1] if pca.variance|length > 1 else '—' }}% · <b>Total:</b> {{ pca.total_variance }}%</p>
+</section>
+
+<section class="panel">
+  <h2>5. t-SNE</h2>
+  <p>t-SNE creates a nonlinear 2D representation for visualizing local similarities in the solar observations.</p>
+  {% if tsne.plot %}<img class="analysis-plot" src="{{ url_for('static', filename=tsne.plot) }}" alt="t-SNE visualization">{% endif %}
+  <p><b>Visualization sample:</b> {{ tsne.sample_size }} observations.</p>
+</section>
+
+<section class="panel">
+  <h2>6. UMAP</h2>
+  <p>UMAP provides another nonlinear 2D representation and can preserve both local neighborhoods and broader structure.</p>
+  {% if umap.plot %}
+    <img class="analysis-plot" src="{{ url_for('static', filename=umap.plot) }}" alt="UMAP visualization">
+    <p><b>Visualization sample:</b> {{ umap.sample_size }} observations.</p>
+  {% else %}
+    <p><b>{{ umap.error }}</b></p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h2>7. Anomaly Detection</h2>
+  <p>Isolation Forest identifies observations that are unusual across the selected solar and weather features. These are statistical anomalies, not confirmed physical faults.</p>
+  {% if anomaly.plot %}<img class="analysis-plot" src="{{ url_for('static', filename=anomaly.plot) }}" alt="Anomaly detection">{% endif %}
+  <p><b>Anomalies:</b> {{ anomaly.count }} / {{ rows }} ({{ anomaly.percentage }}%).</p>
+</section>
+
+<section class="panel">
+  <h2>How this fits SolarSense</h2>
+  <div class="workflow">
+    <div>Cluster normal operating conditions</div>
+    <div>Compare plant operating patterns</div>
+    <div>Find dense and sparse regions</div>
+    <div>Visualize hidden structure</div>
+    <div>Flag unusual observations</div>
+  </div>
+</section>
+
+{% endif %}
+{% endblock %}

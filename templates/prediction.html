@@ -1,0 +1,14 @@
+{% extends 'base.html' %}{% block title %}SolarSense Prediction{% endblock %}
+{% block content %}<h1>SolarSense Prediction</h1><p>Enter a plant/inverter observation to estimate AC generation and potential fault probability.</p>
+<form method="post" class="form-grid">
+<label>Date/time<input name="date_time" type="datetime-local" required value="2020-06-01T12:00"></label>
+<label>Plant<select name="plant_id">{% for p in plants %}<option value="{{p}}">{{p}}</option>{% endfor %}</select></label>
+<label>Inverter/source<select name="source_key">{% for s in sources %}<option value="{{s}}">{{s}}</option>{% endfor %}</select></label>
+<label>DC power<input name="dc_power" type="number" step="any" value="1000" required></label>
+<label>Daily yield<input name="daily_yield" type="number" step="any" value="5000" required></label>
+<label>Irradiation<input name="irradiation" type="number" step="any" min="0" value="0.8" required></label>
+<label>Ambient temperature<input name="ambient_temperature" type="number" step="any" value="28" required></label>
+<label>Module temperature<input name="module_temperature" type="number" step="any" value="35" required></label>
+<button type="submit">Run SolarSense</button></form>
+{% if error %}<div class="alert">{{error}}</div>{% endif %}
+{% if result %}<div class="result"><h2>Prediction result</h2><div class="result-grid"><div><span>Predicted AC power</span><strong>{{result.generation}}</strong></div><div><span>Potential fault</span><strong>{{'YES' if result.fault else 'NO'}}</strong></div><div><span>Fault probability</span><strong>{{result.fault_probability}}%</strong></div></div></div>{% endif %}{% endblock %}
